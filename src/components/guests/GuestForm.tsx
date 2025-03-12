@@ -55,12 +55,13 @@ type FormValues = z.infer<typeof formSchema>;
 const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: guest || {
-      name: "",
-      email: "",
-      phone: "",
-      ticketType: "",
-      status: "pending"
+    defaultValues: {
+      id: guest?.id,
+      name: guest?.name || "",
+      email: guest?.email || "",
+      phone: guest?.phone || "",
+      ticketType: guest?.ticketType || "",
+      status: guest?.status || "pending"
     }
   });
 
@@ -75,24 +76,24 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
   };
 
   return (
-    <div className={cn("glass-card rounded-xl p-6 animate-scale-in", className)}>
+    <div className={cn("glass-card rounded-xl p-6 animate-scale-in shadow-lg", className)}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-medium">{guest ? 'Edit Guest' : 'Add New Guest'}</h3>
+        <h3 className="text-xl font-semibold">{guest ? 'Edit Guest' : 'Add New Guest'}</h3>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel className="text-gray-700">Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="John Doe" {...field} className="border-gray-300 focus:border-primary" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,9 +105,9 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-gray-700">Email Address</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="john.doe@example.com" {...field} />
+                  <Input type="email" placeholder="john.doe@example.com" {...field} className="border-gray-300 focus:border-primary" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,9 +119,9 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel className="text-gray-700">Phone Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="+1 (123) 456-7890" {...field} />
+                  <Input placeholder="+1 (123) 456-7890" {...field} className="border-gray-300 focus:border-primary" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -132,21 +133,21 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             name="ticketType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ticket Type</FormLabel>
+                <FormLabel className="text-gray-700">Ticket Type</FormLabel>
                 <Select 
                   onValueChange={field.onChange} 
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-gray-300 focus:border-primary">
                       <SelectValue placeholder="Select ticket type" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="VIP">VIP</SelectItem>
-                    <SelectItem value="Standard">Standard</SelectItem>
-                    <SelectItem value="Early Bird">Early Bird</SelectItem>
-                    <SelectItem value="Group">Group</SelectItem>
+                    <SelectItem value="VIP">VIP ($250)</SelectItem>
+                    <SelectItem value="Standard">Standard ($100)</SelectItem>
+                    <SelectItem value="Early Bird">Early Bird ($85)</SelectItem>
+                    <SelectItem value="Group">Group ($75 per person)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -159,13 +160,13 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Status</FormLabel>
+                <FormLabel className="text-gray-700">Status</FormLabel>
                 <Select 
                   onValueChange={field.onChange} 
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-gray-300 focus:border-primary">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
@@ -180,11 +181,11 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             )}
           />
           
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="border-gray-300">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="bg-primary hover:bg-primary/90">
               {guest ? 'Update Guest' : 'Add Guest'}
             </Button>
           </div>

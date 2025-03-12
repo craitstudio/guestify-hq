@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Edit, Trash2, Search, MoreHorizontal } from 'lucide-react';
+import { Edit, Trash2, Search, MoreHorizontal, UserCog, TicketIcon, DollarSign, Phone, Mail } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
 
 interface Guest {
   id: string;
@@ -29,15 +30,17 @@ interface GuestTableProps {
   onDelete: (id: string) => void;
   className?: string;
   loading?: boolean;
+  ticketPrices: Record<string, number>;
 }
 
-const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: GuestTableProps) => {
+const GuestTable = ({ guests, onEdit, onDelete, className, loading = false, ticketPrices }: GuestTableProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const filteredGuests = guests.filter(guest => 
     guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     guest.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    guest.phone.includes(searchQuery)
+    guest.phone.includes(searchQuery) ||
+    guest.ticketType.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = (id: string, name: string) => {
@@ -50,27 +53,34 @@ const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: Gu
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-emerald-100 text-emerald-800';
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
       case 'pending':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'cancelled':
-        return 'bg-rose-100 text-rose-800';
+        return 'bg-rose-100 text-rose-800 border-rose-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
+  const getTicketPrice = (ticketType: string) => {
+    return ticketPrices[ticketType] || 0;
+  };
+
   return (
-    <div className={cn("glass-card rounded-xl p-6", className)}>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-medium">Guest List</h3>
-        <div className="relative">
+    <div className={cn("glass-card rounded-xl p-6 shadow-lg", className)}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div className="flex items-center">
+          <UserCog className="h-5 w-5 text-primary mr-2" />
+          <h3 className="text-xl font-semibold">Guest List</h3>
+        </div>
+        <div className="relative w-full sm:w-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search guests..."
+            placeholder="Search by name, email, or ticket..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 w-64"
+            className="pl-9 w-full sm:w-80 border-gray-300"
           />
         </div>
       </div>
@@ -78,11 +88,15 @@ const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: Gu
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border">
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Name</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Email</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Phone</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Ticket Type</th>
+            <tr className="border-b border-border bg-muted/20">
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Guest</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Contact</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
+                <div className="flex items-center">
+                  <TicketIcon className="h-4 w-4 mr-1" />
+                  Ticket
+                </div>
+              </th>
               <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
               <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Actions</th>
             </tr>
@@ -91,7 +105,7 @@ const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: Gu
             {loading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <tr key={index}>
-                  {Array.from({ length: 6 }).map((_, cellIndex) => (
+                  {Array.from({ length: 5 }).map((_, cellIndex) => (
                     <td key={cellIndex} className="px-4 py-4">
                       <div className="h-6 bg-muted/30 rounded animate-pulse" />
                     </td>
@@ -104,19 +118,39 @@ const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: Gu
                   key={guest.id} 
                   className="transition-colors hover:bg-muted/10"
                 >
-                  <td className="px-4 py-4 text-sm">{guest.name}</td>
-                  <td className="px-4 py-4 text-sm">{guest.email}</td>
-                  <td className="px-4 py-4 text-sm">{guest.phone}</td>
-                  <td className="px-4 py-4 text-sm">{guest.ticketType}</td>
-                  <td className="px-4 py-4 text-sm">
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                  <td className="px-4 py-4">
+                    <div className="font-medium">{guest.name}</div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col space-y-1">
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Mail className="h-3 w-3 mr-1" />
+                        {guest.email}
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Phone className="h-3 w-3 mr-1" />
+                        {guest.phone}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-medium">{guest.ticketType}</span>
+                      <span className="text-sm text-muted-foreground flex items-center mt-1">
+                        <DollarSign className="h-3 w-3 mr-1" />
+                        {getTicketPrice(guest.ticketType)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <Badge className={cn(
+                      "font-normal",
                       getStatusColor(guest.status)
                     )}>
                       {guest.status.charAt(0).toUpperCase() + guest.status.slice(1)}
-                    </span>
+                    </Badge>
                   </td>
-                  <td className="px-4 py-4 text-sm text-right">
+                  <td className="px-4 py-4 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -144,8 +178,8 @@ const GuestTable = ({ guests, onEdit, onDelete, className, loading = false }: Gu
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
-                  No guests found. Try a different search term.
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                  No guests found. Try a different search term or add a new guest.
                 </td>
               </tr>
             )}
