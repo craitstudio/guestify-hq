@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { ticketPrices } from '@/context/AppContext';
 
 interface Guest {
   id: string;
@@ -31,6 +32,7 @@ interface Guest {
   email: string;
   phone: string;
   ticketType: string;
+  pricePaid: number;
   status: 'confirmed' | 'pending' | 'cancelled';
 }
 
@@ -47,6 +49,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().min(10, { message: "Please enter a valid phone number." }),
   ticketType: z.string().min(1, { message: "Please select a ticket type." }),
+  pricePaid: z.coerce.number().min(0, { message: "Price must be at least 0." }),
   status: z.enum(['confirmed', 'pending', 'cancelled'])
 });
 
@@ -62,17 +65,18 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
       email: guest?.email || "",
       phone: guest?.phone || "",
       ticketType: guest?.ticketType || "",
+      pricePaid: guest?.pricePaid || 0,
       status: guest?.status || "pending"
     }
   });
 
   const handleSubmit = (values: FormValues) => {
-    // Ensure all required fields are present by creating a new object with the required structure
     const data: Omit<Guest, 'id'> & { id?: string } = {
       name: values.name,
       email: values.email,
       phone: values.phone,
       ticketType: values.ticketType,
+      pricePaid: values.pricePaid,
       status: values.status,
       ...(values.id ? { id: values.id } : {})
     };
@@ -84,6 +88,22 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
         : "New guest has been added successfully",
     });
     onClose();
+  };
+
+  // Get suggested price based on ticket type
+  const getSuggestedPrice = (ticketType: string) => {
+    return ticketPrices[ticketType as keyof typeof ticketPrices] || 0;
+  };
+
+  // Handle ticket type change to suggest price
+  const handleTicketTypeChange = (value: string) => {
+    form.setValue('ticketType', value);
+    
+    // Only set suggested price if price is 0 or not set yet
+    const currentPrice = form.getValues('pricePaid');
+    if (currentPrice === 0) {
+      form.setValue('pricePaid', getSuggestedPrice(value));
+    }
   };
 
   return (
@@ -139,32 +159,53 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
             )}
           />
           
-          <FormField
-            control={form.control}
-            name="ticketType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700">Ticket Type</FormLabel>
-                <Select 
-                  onValueChange={field.onChange} 
-                  defaultValue={field.value}
-                >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <FormField
+              control={form.control}
+              name="ticketType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Ticket Type</FormLabel>
+                  <Select 
+                    onValueChange={handleTicketTypeChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="border-gray-300 focus:border-primary">
+                        <SelectValue placeholder="Select ticket type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="VIP">VIP</SelectItem>
+                      <SelectItem value="Standard">Standard</SelectItem>
+                      <SelectItem value="Early Bird">Early Bird</SelectItem>
+                      <SelectItem value="Group">Group</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="pricePaid"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Price Paid ($)</FormLabel>
                   <FormControl>
-                    <SelectTrigger className="border-gray-300 focus:border-primary">
-                      <SelectValue placeholder="Select ticket type" />
-                    </SelectTrigger>
+                    <Input 
+                      type="number" 
+                      placeholder="Enter price" 
+                      {...field} 
+                      className="border-gray-300 focus:border-primary" 
+                    />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="VIP">VIP ($250)</SelectItem>
-                    <SelectItem value="Standard">Standard ($100)</SelectItem>
-                    <SelectItem value="Early Bird">Early Bird ($85)</SelectItem>
-                    <SelectItem value="Group">Group ($75 per person)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           
           <FormField
             control={form.control}

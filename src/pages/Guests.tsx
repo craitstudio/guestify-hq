@@ -6,7 +6,7 @@ import GuestForm from '@/components/guests/GuestForm';
 import { Button } from "@/components/ui/button";
 import { UserPlus, Users, TicketIcon, UserCheck, Clock } from 'lucide-react';
 import StatCard from '@/components/dashboard/StatCard';
-import { useAppContext, ticketPrices, Guest } from '@/context/AppContext';
+import { useAppContext, Guest } from '@/context/AppContext';
 
 const Guests = () => {
   const { guests, loading, addGuest, updateGuest, deleteGuest } = useAppContext();
@@ -51,7 +51,7 @@ const Guests = () => {
   const calculateTotalRevenue = () => {
     return guests.reduce((total, guest) => {
       if (guest.status !== 'cancelled') {
-        return total + (ticketPrices[guest.ticketType as keyof typeof ticketPrices] || 0);
+        return total + guest.pricePaid;
       }
       return total;
     }, 0);
@@ -115,7 +115,6 @@ const Guests = () => {
             onEdit={handleEdit}
             onDelete={handleDeleteGuest}
             loading={loading}
-            ticketPrices={ticketPrices}
           />
         </div>
       </div>

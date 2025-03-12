@@ -9,6 +9,7 @@ export interface Guest {
   email: string;
   phone: string;
   ticketType: string;
+  pricePaid: number;
   status: 'confirmed' | 'pending' | 'cancelled';
 }
 
@@ -30,6 +31,7 @@ const mockGuests: Guest[] = [
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
     ticketType: 'VIP',
+    pricePaid: 250,
     status: 'confirmed'
   },
   {
@@ -38,6 +40,7 @@ const mockGuests: Guest[] = [
     email: 'jane.smith@example.com',
     phone: '+1 (555) 987-6543',
     ticketType: 'Standard',
+    pricePaid: 100,
     status: 'confirmed'
   },
   {
@@ -46,6 +49,7 @@ const mockGuests: Guest[] = [
     email: 'robert.johnson@example.com',
     phone: '+1 (555) 456-7890',
     ticketType: 'Early Bird',
+    pricePaid: 85,
     status: 'pending'
   },
   {
@@ -54,6 +58,7 @@ const mockGuests: Guest[] = [
     email: 'emily.davis@example.com',
     phone: '+1 (555) 789-0123',
     ticketType: 'Group',
+    pricePaid: 75,
     status: 'cancelled'
   },
   {
@@ -62,6 +67,7 @@ const mockGuests: Guest[] = [
     email: 'michael.wilson@example.com',
     phone: '+1 (555) 321-0987',
     ticketType: 'VIP',
+    pricePaid: 250,
     status: 'confirmed'
   }
 ];
