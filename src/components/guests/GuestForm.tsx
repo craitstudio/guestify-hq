@@ -66,8 +66,17 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
     }
   });
 
-  const handleSubmit = (data: FormValues) => {
-    // Since we've provided default values for all fields, this will always satisfy the type constraints
+  const handleSubmit = (values: FormValues) => {
+    // Ensure all required fields are present by creating a new object with the required structure
+    const data: Omit<Guest, 'id'> & { id?: string } = {
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      ticketType: values.ticketType,
+      status: values.status,
+      ...(values.id ? { id: values.id } : {})
+    };
+    
     onSubmit(data);
     toast.success(guest ? "Guest updated" : "Guest added", {
       description: guest 
