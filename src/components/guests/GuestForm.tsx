@@ -53,7 +53,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
-  // The key fix is here - ensure all required fields have non-undefined default values
+  // Initialize form with proper default values to ensure all required fields have values
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,6 +67,7 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
   });
 
   const handleSubmit = (data: FormValues) => {
+    // Since we've provided default values for all fields, this will always satisfy the type constraints
     onSubmit(data);
     toast.success(guest ? "Guest updated" : "Guest added", {
       description: guest 
