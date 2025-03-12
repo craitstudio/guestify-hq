@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Container from '@/components/layout/Container';
 import { QrCode, Search, ScanLine, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from 'sonner';
 import LoadingDots from '@/components/ui/LoadingDots';
+import { cn } from '@/lib/utils';
 
 interface ScanResult {
   ticketNumber: string;
@@ -22,7 +22,6 @@ const QRCode = () => {
   const [scanResults, setScanResults] = useState<ScanResult[]>([]);
   const [currentScan, setCurrentScan] = useState<ScanResult | null>(null);
 
-  // Mock scan result data
   const mockScanResults: ScanResult[] = [
     {
       ticketNumber: 'VIP-001-2023',
@@ -48,7 +47,6 @@ const QRCode = () => {
   ];
 
   useEffect(() => {
-    // Load initial scan results
     setScanResults(mockScanResults);
   }, []);
 
@@ -62,7 +60,6 @@ const QRCode = () => {
 
     setIsScanning(true);
 
-    // Simulate scanning
     setTimeout(() => {
       const mockResult: ScanResult = {
         ticketNumber: ticketNumber,

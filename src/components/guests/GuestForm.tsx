@@ -50,8 +50,10 @@ const formSchema = z.object({
   status: z.enum(['confirmed', 'pending', 'cancelled'])
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: guest || {
       name: "",
@@ -62,7 +64,7 @@ const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
     }
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+  const handleSubmit = (data: FormValues) => {
     onSubmit(data);
     toast.success(guest ? "Guest updated" : "Guest added", {
       description: guest 
