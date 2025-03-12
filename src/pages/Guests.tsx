@@ -1,109 +1,28 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Container from '@/components/layout/Container';
 import GuestTable from '@/components/guests/GuestTable';
 import GuestForm from '@/components/guests/GuestForm';
 import { Button } from "@/components/ui/button";
-import { UserPlus, Users, TicketIcon, UserCheck, Clock, ShieldAlert } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
-import { Card, CardContent } from "@/components/ui/card";
+import { UserPlus, Users, TicketIcon, UserCheck, Clock } from 'lucide-react';
 import StatCard from '@/components/dashboard/StatCard';
-
-interface Guest {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  ticketType: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
-}
-
-// Mock initial guest data
-const mockGuests: Guest[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    ticketType: 'VIP',
-    status: 'confirmed'
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '+1 (555) 987-6543',
-    ticketType: 'Standard',
-    status: 'confirmed'
-  },
-  {
-    id: '3',
-    name: 'Robert Johnson',
-    email: 'robert.johnson@example.com',
-    phone: '+1 (555) 456-7890',
-    ticketType: 'Early Bird',
-    status: 'pending'
-  },
-  {
-    id: '4',
-    name: 'Emily Davis',
-    email: 'emily.davis@example.com',
-    phone: '+1 (555) 789-0123',
-    ticketType: 'Group',
-    status: 'cancelled'
-  },
-  {
-    id: '5',
-    name: 'Michael Wilson',
-    email: 'michael.wilson@example.com',
-    phone: '+1 (555) 321-0987',
-    ticketType: 'VIP',
-    status: 'confirmed'
-  }
-];
-
-// Ticket price data
-const ticketPrices = {
-  'VIP': 250,
-  'Standard': 100,
-  'Early Bird': 85,
-  'Group': 75
-};
+import { useAppContext, ticketPrices, Guest } from '@/context/AppContext';
 
 const Guests = () => {
-  const [guests, setGuests] = useState<Guest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { guests, loading, addGuest, updateGuest, deleteGuest } = useAppContext();
   const [showForm, setShowForm] = useState(false);
   const [editingGuest, setEditingGuest] = useState<Guest | undefined>(undefined);
 
-  useEffect(() => {
-    // Simulate API loading
-    const timer = setTimeout(() => {
-      setGuests(mockGuests);
-      setLoading(false);
-    }, 1200);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleAddGuest = (data: Omit<Guest, 'id'>) => {
-    const newGuest: Guest = {
-      ...data,
-      id: uuidv4()
-    };
-    setGuests(prevGuests => [...prevGuests, newGuest]);
+    addGuest(data);
   };
 
   const handleEditGuest = (data: Guest) => {
-    setGuests(prevGuests => 
-      prevGuests.map(guest => 
-        guest.id === data.id ? data : guest
-      )
-    );
+    updateGuest(data);
   };
 
   const handleDeleteGuest = (id: string) => {
-    setGuests(prevGuests => prevGuests.filter(guest => guest.id !== id));
+    deleteGuest(id);
   };
 
   const handleEdit = (guest: Guest) => {

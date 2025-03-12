@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Container from '@/components/layout/Container';
 import TicketCard from '@/components/tickets/TicketCard';
 import TicketGenerator from '@/components/tickets/TicketGenerator';
@@ -20,93 +20,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
-
-interface Ticket {
-  id: string;
-  guestId: string;
-  guestName: string;
-  ticketNumber: string;
-  ticketType: string;
-  eventDate: string;
-  status: 'valid' | 'used' | 'expired';
-}
-
-// Mock ticket data
-const mockTickets: Ticket[] = [
-  {
-    id: '1',
-    guestId: '1',
-    guestName: 'John Doe',
-    ticketNumber: 'VIP-001-2023',
-    ticketType: 'VIP',
-    eventDate: 'Oct 15, 2023',
-    status: 'valid'
-  },
-  {
-    id: '2',
-    guestId: '2',
-    guestName: 'Jane Smith',
-    ticketNumber: 'STD-002-2023',
-    ticketType: 'Standard',
-    eventDate: 'Oct 15, 2023',
-    status: 'used'
-  },
-  {
-    id: '3',
-    guestId: '3',
-    guestName: 'Robert Johnson',
-    ticketNumber: 'EB-003-2023',
-    ticketType: 'Early Bird',
-    eventDate: 'Oct 15, 2023',
-    status: 'valid'
-  },
-  {
-    id: '4',
-    guestId: '4',
-    guestName: 'Emily Davis',
-    ticketNumber: 'GRP-004-2023',
-    ticketType: 'Group',
-    eventDate: 'Oct 15, 2023',
-    status: 'expired'
-  },
-  {
-    id: '5',
-    guestId: '5',
-    guestName: 'Michael Wilson',
-    ticketNumber: 'VIP-005-2023',
-    ticketType: 'VIP',
-    eventDate: 'Oct 15, 2023',
-    status: 'valid'
-  },
-  {
-    id: '6',
-    guestId: '6',
-    guestName: 'Sarah Thompson',
-    ticketNumber: 'STD-006-2023',
-    ticketType: 'Standard',
-    eventDate: 'Oct 15, 2023',
-    status: 'used'
-  }
-];
+import { useAppContext, Ticket } from '@/context/AppContext';
 
 const Tickets = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { tickets, loading, updateTicket } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [showGenerator, setShowGenerator] = useState(false);
-
-  useEffect(() => {
-    // Simulate API loading
-    const timer = setTimeout(() => {
-      setTickets(mockTickets);
-      setLoading(false);
-    }, 1200);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleGenerateQR = (ticket: Ticket) => {
     setSelectedTicket(ticket);

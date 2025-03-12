@@ -1,10 +1,12 @@
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Users, Ticket, QrCode, Home } from 'lucide-react';
 
 const Header = () => {
+  const location = useLocation();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass-panel">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
