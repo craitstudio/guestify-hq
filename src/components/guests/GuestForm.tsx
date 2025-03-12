@@ -53,6 +53,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const GuestForm = ({ guest, onClose, onSubmit, className }: GuestFormProps) => {
+  // The key fix is here - ensure all required fields have non-undefined default values
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
